@@ -1,0 +1,33 @@
+accounts:
+  - handle: MacroSignals
+    source_type: kol
+  - handle: CryptoDesk
+    source_type: kol
+  - handle: EquityBrief
+    source_type: kol
+  - handle: RatesWatcher
+    source_type: kol
+  - handle: ETFTracker
+    source_type: kol
+  - handle: EnergyTape
+    source_type: kol
+  - handle: AIStockNotes
+    source_type: kol
+  - handle: RegWatch
+    source_type: kol
+  - handle: BondDesk
+    source_type: kol
+  - handle: QuantFlow
+    source_type: kol
+  - handle: CryptoAlan
+    source_type: kol
+  - handle: DeFiWatcher
+    source_type: kol
+  - handle: YieldCurvePro
+    source_type: kol
+  - handle: MacroMaven
+    source_type: kol
+  - handle: ETFPulse
+    source_type: kol
+  - handle: OnChainLens
+    source_type: kol

@@ -1,0 +1,10 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.7
+pillow>=10.0
+SQLAlchemy>=2.0
+psycopg[binary]>=3.1
+PyYAML>=6.0
+APScheduler>=3.10
+filelock>=3.13
+pytest>=8.0

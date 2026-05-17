@@ -1,0 +1,21 @@
+platforms:
+  x:
+    enabled: true
+    mode: mock
+  telegram:
+    enabled: false
+    channel_id: ""
+  threads:
+    enabled: false
+    mode: mock
+experiments:
+  ab_testing:
+    enabled: true
+    variants:
+      - A
+      - B
+fact_sources:
+  external_enabled: false
+  providers:
+    - coingecko
+    - yahoo_finance

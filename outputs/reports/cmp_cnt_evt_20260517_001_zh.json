@@ -1,0 +1,10 @@
+{
+  "compliance_report_id": "cmp_cnt_evt_20260517_001_zh",
+  "content_id": "cnt_evt_20260517_001_zh",
+  "pass": true,
+  "risk_level": "low",
+  "issues": [],
+  "revision_instruction": "",
+  "requires_human_review": true,
+  "reviewed_by": "rules"
+}

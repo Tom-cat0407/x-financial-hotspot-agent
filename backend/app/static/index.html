@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>X 金融热点 Agent</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, "Microsoft YaHei", sans-serif; background: #f8fafc; color: #0f172a; }
+    header { background: #0f172a; color: #fff; padding: 18px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    h1 { font-size: 20px; margin: 0; letter-spacing: 0; }
+    button { border: 0; border-radius: 6px; background: #0ea5e9; color: #fff; padding: 10px 14px; font-weight: 700; cursor: pointer; }
+    button.secondary { background: #334155; }
+    main { width: min(1280px, calc(100vw - 32px)); margin: 22px auto 60px; display: grid; gap: 18px; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 18px; align-items: start; }
+    .panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; }
+    .panel h2 { margin: 0 0 12px; font-size: 18px; }
+    .cards { display: grid; gap: 12px; }
+    .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; background: #fff; }
+    .card h3 { margin: 0 0 8px; font-size: 16px; }
+    .muted { color: #64748b; font-size: 13px; }
+    .score { font-size: 26px; color: #0369a1; font-weight: 800; }
+    .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .tag { background: #e0f2fe; color: #075985; border-radius: 999px; padding: 4px 8px; font-size: 12px; }
+    .tweet { white-space: pre-wrap; line-height: 1.45; }
+    a { color: #0369a1; }
+    img { max-width: 100%; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 10px; }
+    pre { white-space: pre-wrap; background: #f1f5f9; border-radius: 8px; padding: 12px; max-height: 320px; overflow: auto; }
+    @media (max-width: 900px) {
+      header, .toolbar { align-items: stretch; flex-direction: column; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>X 平台金融热点内容自动化运营 Agent</h1>
+    <div>
+      <button id="run">运行端到端 Demo</button>
+      <button id="refresh" class="secondary">刷新状态</button>
+    </div>
+  </header>
+  <main>
+    <div class="toolbar">
+      <div class="muted">Mock X API · 热点聚类 · 合规审核 · 模板配图 · 人工审核记录 · Mock 发布链接</div>
+      <div id="status" class="muted">等待运行</div>
+    </div>
+    <section class="grid">
+      <div class="panel">
+        <h2>Top 热点</h2>
+        <div id="hotspots" class="cards"></div>
+      </div>
+      <div class="panel">
+        <h2>Mock 发布链接</h2>
+        <div id="published" class="cards"></div>
+      </div>
+    </section>
+    <section class="grid">
+      <div class="panel">
+        <h2>审核队列</h2>
+        <div id="reviews" class="cards"></div>
+      </div>
+      <div class="panel">
+        <h2>运行事件</h2>
+        <pre id="events"></pre>
+      </div>
+    </section>
+  </main>
+  <script>
+    const statusEl = document.querySelector("#status");
+    document.querySelector("#run").addEventListener("click", async () => {
+      statusEl.textContent = "运行中...";
+      const response = await fetch("/api/demo/run?auto_approve=true&publish_count=3", { method: "POST" });
+      if (!response.ok) {
+        statusEl.textContent = "运行失败";
+        alert(await response.text());
+        return;
+      }
+      statusEl.textContent = "Demo 已完成";
+      await render();
+    });
+    document.querySelector("#refresh").addEventListener("click", render);
+
+    async function render() {
+      const state = await fetch("/api/state").then(r => r.json());
+      renderHotspots(state);
+      renderPublished(state);
+      renderReviews(state);
+      document.querySelector("#events").textContent = JSON.stringify(state.run_events || [], null, 2);
+      statusEl.textContent = `热点 ${state.event_clusters?.length || 0} · 已发布 ${state.publish_records?.length || 0}`;
+    }
+
+    function renderHotspots(state) {
+      const scores = Object.fromEntries((state.hot_scores || []).map(s => [s.cluster_id, s]));
+      const items = [...(state.event_clusters || [])].sort((a, b) => (scores[b.cluster_id]?.hot_score || 0) - (scores[a.cluster_id]?.hot_score || 0));
+      document.querySelector("#hotspots").innerHTML = items.map(item => {
+        const score = scores[item.cluster_id] || { hot_score: 0, score_breakdown: {} };
+        return `<article class="card">
+          <div class="score">${score.hot_score}</div>
+          <h3>${escapeHtml(item.main_title)}</h3>
+          <div class="muted">${item.event_type} · ${item.source_count} sources · ${item.emergency?.emergency_level || "low"} priority</div>
+          <p>${escapeHtml(item.summary)}</p>
+          <pre>${escapeHtml(JSON.stringify(score.score_breakdown, null, 2))}</pre>
+        </article>`;
+      }).join("") || `<div class="muted">还没有运行 Demo。</div>`;
+    }
+
+    function renderPublished(state) {
+      const cards = Object.fromEntries((state.image_cards || []).map(c => [c.content_id, c]));
+      document.querySelector("#published").innerHTML = (state.publish_records || []).map(item => {
+        const card = cards[item.content_id];
+        const img = card ? `<img src="/outputs/cards/${card.card_path.split(/[\\\\/]/).pop()}" alt="card">` : "";
+        return `<article class="card">
+          <h3>${item.mock_post_id}</h3>
+          <p class="tweet">${escapeHtml(item.tweet_text || "")}</p>
+          <a href="${item.mock_post_url}" target="_blank">${item.mock_post_url}</a>
+          ${img}
+        </article>`;
+      }).join("") || `<div class="muted">运行后会生成三条本地 mock 链接。</div>`;
+    }
+
+    function renderReviews(state) {
+      document.querySelector("#reviews").innerHTML = (state.review_queue || []).map(item => `<article class="card">
+        <h3>${item.review_status} · ${item.risk_level}</h3>
+        <p class="tweet">${escapeHtml(item.tweet_text)}</p>
+        <div class="muted">${item.content_id}</div>
+      </article>`).join("") || `<div class="muted">暂无审核项。</div>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+    }
+
+    render();
+  </script>
+</body>
+</html>

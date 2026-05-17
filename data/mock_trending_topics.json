@@ -1,0 +1,8 @@
+[
+  { "topic": "#Bitcoin", "volume": 185000 },
+  { "topic": "#ETF", "volume": 87000 },
+  { "topic": "#CPI", "volume": 65000 },
+  { "topic": "#Fed", "volume": 72000 },
+  { "topic": "#Nvidia", "volume": 98000 },
+  { "topic": "#SEC", "volume": 54000 }
+]

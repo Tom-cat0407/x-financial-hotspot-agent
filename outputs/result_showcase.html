@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>X 平台金融热点系统验收报告</title>
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --surface: #fffaf3;
+      --ink: #1f2933;
+      --muted: #657282;
+      --line: #e7dccc;
+      --accent: #0f766e;
+      --accent-2: #b45309;
+      --ok: #047857;
+      --warn: #b45309;
+      --shadow: 0 18px 40px rgba(31, 41, 51, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, #e4f7f3 0, transparent 32rem), var(--bg);
+      color: var(--ink);
+      font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      line-height: 1.55;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    .shell { display: grid; grid-template-columns: 280px minmax(0, 1fr); min-height: 100vh; }
+    aside { background: #17202b; color: white; padding: 28px 22px; position: sticky; top: 0; height: 100vh; }
+    aside h1 { font-size: 20px; line-height: 1.2; margin: 0 0 8px; }
+    aside p { color: #b7c2cf; font-size: 13px; margin: 0 0 24px; }
+    nav { display: grid; gap: 8px; }
+    nav a { border-radius: 10px; color: #e5e7eb; padding: 10px 12px; }
+    nav a:hover { background: rgba(255,255,255,.08); }
+    main { padding: 34px; }
+    .hero {
+      background: linear-gradient(135deg, #0f766e 0%, #12343b 100%);
+      border-radius: 22px;
+      color: white;
+      box-shadow: var(--shadow);
+      padding: 36px;
+      margin-bottom: 24px;
+    }
+    .hero h2 { font-size: 34px; margin: 0 0 10px; max-width: 880px; }
+    .hero p { color: #d7fffa; margin: 0; max-width: 760px; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .hero-meta span { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); border-radius: 999px; padding: 7px 11px; font-size: 13px; }
+    .metrics { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 14px; margin-bottom: 24px; }
+    .metric, .section, .hotspot, .publish, .mini-card, .check-card, .content-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+    .metric { padding: 18px; }
+    .metric strong { display: block; color: var(--accent); font-size: 30px; line-height: 1; }
+    .metric span { color: var(--muted); font-size: 13px; }
+    .section { padding: 24px; margin-bottom: 24px; }
+    .section-head { align-items: end; display: flex; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+    .eyebrow { color: var(--accent-2); font-size: 12px; font-weight: 800; letter-spacing: .08em; margin: 0 0 4px; text-transform: uppercase; }
+    h2 { font-size: 24px; margin: 0; }
+    h3 { margin: 0 0 8px; }
+    .check-grid, .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .check-card { align-items: center; display: flex; justify-content: space-between; gap: 14px; padding: 16px; box-shadow: none; }
+    .check-card p, .muted { color: var(--muted); margin: 0; }
+    .check-right { display: grid; gap: 8px; justify-items: end; min-width: 150px; }
+    .count { color: var(--muted); font-size: 12px; }
+    .badge { border-radius: 999px; font-size: 12px; font-weight: 800; padding: 5px 9px; white-space: nowrap; }
+    .badge.ok { background: #d1fae5; color: var(--ok); }
+    .badge.warn { background: #ffedd5; color: var(--warn); }
+    .hotspot { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 16px; margin-bottom: 12px; padding: 16px; box-shadow: none; }
+    .rank { align-items: center; background: #e7f8f5; border-radius: 14px; color: var(--accent); display: flex; font-weight: 900; justify-content: center; }
+    .hotspot-title { align-items: center; display: flex; justify-content: space-between; gap: 14px; }
+    .hotspot-title strong { color: var(--accent); font-size: 28px; }
+    .hotspot p { color: var(--muted); }
+    .chips, .breakdown { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+    .chips span, .breakdown span { background: #f1f5f9; border-radius: 999px; color: #475569; font-size: 12px; padding: 5px 9px; }
+    .breakdown span { background: #fff7ed; color: #9a3412; }
+    .breakdown b { margin-right: 6px; }
+    .entities { color: var(--accent); font-size: 13px; font-weight: 700; margin-top: 8px; }
+    .publish, .mini-card { padding: 16px; box-shadow: none; margin-bottom: 12px; }
+    .publish-top { align-items: center; display: flex; justify-content: space-between; gap: 10px; }
+    .mini-grid, .artifacts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .mini-card ul { list-style: none; margin: 0; padding: 0; }
+    .mini-card li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; }
+    .content-card { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 14px; padding: 14px; margin-bottom: 12px; box-shadow: none; }
+    .content-card img { width: 220px; aspect-ratio: 16/9; object-fit: cover; border-radius: 12px; border: 1px solid var(--line); }
+    .artifact { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; display: grid; padding: 14px; }
+    .artifact span { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+    .empty { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 16px; color: var(--muted); padding: 18px; }
+    @media (max-width: 1080px) {
+      .shell { grid-template-columns: 1fr; }
+      aside { height: auto; position: static; }
+      main { padding: 18px; }
+      .metrics, .check-grid, .two-col, .mini-grid, .artifacts, .content-card { grid-template-columns: 1fr; }
+      .content-card img { width: 100%; }
+    }
+    @media print {
+      aside { display: none; }
+      .shell { display: block; }
+      main { padding: 0; }
+      .section, .hero { break-inside: avoid; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <h1>X 金融热点系统<br/>验收报告</h1>
+      <p>由 outputs/state.json 自动生成，按测试题能力项组织。</p>
+      <nav>
+        <a href="#summary">结果摘要</a>
+        <a href="#core">核心能力</a>
+        <a href="#bonus">扩展能力</a>
+        <a href="#llm">LLM 证据</a>
+        <a href="#hotspots">Top 热点</a>
+        <a href="#contents">内容与配图</a>
+        <a href="#publishing">发布与反馈</a>
+        <a href="#artifacts">交付物</a>
+      </nav>
+    </aside>
+    <main>
+      <section id="summary" class="hero">
+        <p class="eyebrow">Submission Result</p>
+        <h2>X 平台金融热点内容自动化运营系统</h2>
+        <p>本报告由 outputs/state.json 自动生成，覆盖测试题核心能力、扩展能力、发布证据、A/B 实验和反馈闭环。</p>
+        <div class="hero-meta">
+          <span>报告类型：完整验收结果</span>
+          <span>生成时间：2026-05-17 18:53:21</span>
+          <span>数据源：outputs/state.json</span>
+        </div>
+      </section>
+      <section class="metrics">
+        <article class="metric">
+          <strong>30</strong>
+          <span>原始帖子</span>
+        </article>
+        
+        <article class="metric">
+          <strong>11</strong>
+          <span>事件簇</span>
+        </article>
+        
+        <article class="metric">
+          <strong>11</strong>
+          <span>热度分数</span>
+        </article>
+        
+        <article class="metric">
+          <strong>8</strong>
+          <span>生成内容</span>
+        </article>
+        
+        <article class="metric">
+          <strong>6</strong>
+          <span>LLM 文案</span>
+        </article>
+        
+        <article class="metric">
+          <strong>7</strong>
+          <span>LLM 合规</span>
+        </article>
+        
+        <article class="metric">
+          <strong>6</strong>
+          <span>Mock 发布</span>
+        </article>
+        
+        <article class="metric">
+          <strong>8</strong>
+          <span>A/B 变体</span>
+        </article>
+        
+        <article class="metric">
+          <strong>6</strong>
+          <span>反馈指标</span>
+        </article>
+        
+        <article class="metric">
+          <strong>12</strong>
+          <span>平台分发</span>
+        </article>
+        </section>
+      
+    <section id="core" class="section">
+      <div class="section-head">
+        <p class="eyebrow">Assessment Mapping</p>
+        <h2>core</h2>
+      </div>
+      <div class="check-grid">
+            <article class="check-card">
+              <div>
+                <h3>数据采集</h3>
+                <p>KOL、财经媒体、关键词与趋势话题采集，保留原始数据依据。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">30 条证据</span>
+              </div>
+            </article>
+            
+            <article class="check-card">
+              <div>
+                <h3>热点筛选</h3>
+                <p>同事件聚类，输出 Top N、热度分数与 score_breakdown。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">11 条证据</span>
+              </div>
+            </article>
+            
+            <article class="check-card">
+              <div>
+                <h3>关键词与 Hashtag</h3>
+                <p>实体抽取、Trending Topics 融合、3-5 个中英文 Hashtag。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">8 条证据</span>
+              </div>
+            </article>
+            
+            <article class="check-card">
+              <div>
+                <h3>内容生成</h3>
+                <p>DeepSeek/规则兜底生成原创推文，满足 280 字符、核心信息、Hashtag 与免责声明。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">8 条证据</span>
+              </div>
+            </article>
+            
+            <article class="check-card">
+              <div>
+                <h3>配图生成</h3>
+                <p>HTML/CSS 动态卡片模板生成 16:9 图片，包含标题、数据指标与品牌标识。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">8 条证据</span>
+              </div>
+            </article>
+            
+            <article class="check-card">
+              <div>
+                <h3>审核与发布</h3>
+                <p>合规审核、人工审核队列、Mock X 发布链接、失败与频率控制。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">6 条证据</span>
+              </div>
+            </article>
+            </div>
+    </section>
+    
+      
+    <section id="bonus" class="section">
+      <div class="section-head">
+        <p class="eyebrow">Assessment Mapping</p>
+        <h2>bonus</h2>
+      </div>
+      <div class="check-grid">
+            <article class="check-card">
+              <div>
+                <h3>Agent 框架</h3>
+                <p>10 个独立 Agent 模块、状态机编排、agent_manifest.yaml。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">11 条证据</span>
+              </div>
+            </article>
+            
+            <article class="check-card">
+              <div>
+                <h3>反馈闭环</h3>
+                <p>发布后回收互动指标，更新 style/source/hashtag 策略权重。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">6 条证据</span>
+              </div>
+            </article>
+            
+            <article class="check-card">
+              <div>
+                <h3>多平台分发</h3>
+                <p>Telegram Bot API 适配器 + Threads mock 适配器。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">12 条证据</span>
+              </div>
+            </article>
+            
+            <article class="check-card">
+              <div>
+                <h3>A/B 测试</h3>
+                <p>A/B 变体分别发布、回收指标并标记 winner。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">8 条证据</span>
+              </div>
+            </article>
+            
+            <article class="check-card">
+              <div>
+                <h3>突发优先级</h3>
+                <p>重大金融事件触发 emergency boost 与人工审核。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">11 条证据</span>
+              </div>
+            </article>
+            
+            <article class="check-card">
+              <div>
+                <h3>RAG 事实校验</h3>
+                <p>MockFinanceDataClient，可选 CoinGecko/Yahoo Finance 外部事实源。</p>
+              </div>
+              <div class="check-right">
+                <span class="badge ok">已完成</span>
+                <span class="count">2 条证据</span>
+              </div>
+            </article>
+            </div>
+    </section>
+    
+      
+    <section id="llm" class="section">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">DeepSeek Evidence</p>
+          <h2>LLM 调用结果</h2>
+        </div>
+      </div>
+      <div class="two-col">
+        <article class="mini-card">
+          <h3>文案生成</h3>
+          <ul>
+            <li><span>DeepSeek 生成</span><b>6</b></li>
+            <li><span>规则兜底</span><b>2</b></li>
+          </ul>
+        </article>
+        <article class="mini-card">
+          <h3>合规复核</h3>
+          <ul>
+            <li><span>LLM + 规则</span><b>7</b></li>
+            <li><span>纯规则</span><b>1</b></li>
+          </ul>
+        </article>
+      </div>
+      <div class="mini-card">
+        <h3>LLM 错误</h3>
+        <ul><li>timeout</li><li>timeout</li><li>timeout</li></ul>
+      </div>
+    </section>
+    
+      <section id="hotspots" class="section">
+        <div class="section-head"><div><p class="eyebrow">Hotspot Ranking</p><h2>Top 热点与评分依据</h2></div></div>
+        
+            <article class="hotspot">
+              <div class="rank">#1</div>
+              <div class="hotspot-main">
+                <div class="hotspot-title">
+                  <h3>CPI, Fed, Treasury macro policy signals move into focus</h3>
+                  <strong>86.5</strong>
+                </div>
+                <p>7 independent mock sources are discussing CPI, Fed, Treasury in a central bank context.</p>
+                <div class="chips">
+                  <span>central_bank</span>
+                  <span>7 sources</span>
+                  <span>medium priority</span>
+                </div>
+                <div class="entities">CPI, Fed, Treasury</div>
+                <div class="breakdown"><span><b>engagement_velocity</b>21.5</span><span><b>source_authority</b>15.1</span><span><b>cross_source_confirmation</b>15</span><span><b>market_relevance</b>13.4</span><span><b>keyword_match</b>6.2</span><span><b>trend_boost</b>5.0</span><span><b>time_decay</b>0.3</span><span><b>emergency_boost</b>10</span></div>
+              </div>
+            </article>
+            
+            <article class="hotspot">
+              <div class="rank">#2</div>
+              <div class="hotspot-main">
+                <div class="hotspot-title">
+                  <h3>BTC, Bitcoin, ETF ETF and crypto flow discussion gains attention</h3>
+                  <strong>78.9</strong>
+                </div>
+                <p>9 independent mock sources are discussing BTC, Bitcoin, ETF in a crypto etf context.</p>
+                <div class="chips">
+                  <span>crypto_etf</span>
+                  <span>9 sources</span>
+                  <span>low priority</span>
+                </div>
+                <div class="entities">BTC, Bitcoin, ETF, Ethereum, US</div>
+                <div class="breakdown"><span><b>engagement_velocity</b>22.2</span><span><b>source_authority</b>15.3</span><span><b>cross_source_confirmation</b>15</span><span><b>market_relevance</b>14.2</span><span><b>keyword_match</b>6.9</span><span><b>trend_boost</b>5.0</span><span><b>time_decay</b>0.3</span><span><b>emergency_boost</b>0</span></div>
+              </div>
+            </article>
+            
+            <article class="hotspot">
+              <div class="rank">#3</div>
+              <div class="hotspot-main">
+                <div class="hotspot-title">
+                  <h3>CFTC, SEC regulatory development becomes a hotspot</h3>
+                  <strong>76.2</strong>
+                </div>
+                <p>3 independent mock sources are discussing CFTC, SEC in a regulation context.</p>
+                <div class="chips">
+                  <span>regulation</span>
+                  <span>3 sources</span>
+                  <span>high priority</span>
+                </div>
+                <div class="entities">CFTC, SEC</div>
+                <div class="breakdown"><span><b>engagement_velocity</b>18.9</span><span><b>source_authority</b>16.7</span><span><b>cross_source_confirmation</b>13.5</span><span><b>market_relevance</b>7.5</span><span><b>keyword_match</b>1.9</span><span><b>trend_boost</b>2.5</span><span><b>time_decay</b>0.3</span><span><b>emergency_boost</b>15</span></div>
+              </div>
+            </article>
+            
+            <article class="hotspot">
+              <div class="rank">#4</div>
+              <div class="hotspot-main">
+                <div class="hotspot-title">
+                  <h3>AI, Apple, Microsoft earnings and guidance draw investor attention</h3>
+                  <strong>66.5</strong>
+                </div>
+                <p>4 independent mock sources are discussing AI, Apple, Microsoft in a earnings context.</p>
+                <div class="chips">
+                  <span>earnings</span>
+                  <span>4 sources</span>
+                  <span>low priority</span>
+                </div>
+                <div class="entities">AI, Apple, Microsoft, NVDA, Nvidia</div>
+                <div class="breakdown"><span><b>engagement_velocity</b>20.5</span><span><b>source_authority</b>16.0</span><span><b>cross_source_confirmation</b>15</span><span><b>market_relevance</b>9.2</span><span><b>keyword_match</b>3.1</span><span><b>trend_boost</b>2.5</span><span><b>time_decay</b>0.3</span><span><b>emergency_boost</b>0</span></div>
+              </div>
+            </article>
+            
+            <article class="hotspot">
+              <div class="rank">#5</div>
+              <div class="hotspot-main">
+                <div class="hotspot-title">
+                  <h3>Markets market move draws discussion</h3>
+                  <strong>60.5</strong>
+                </div>
+                <p>1 independent mock sources are discussing the topic in a market move context.</p>
+                <div class="chips">
+                  <span>market_move</span>
+                  <span>1 sources</span>
+                  <span>high priority</span>
+                </div>
+                <div class="entities"></div>
+                <div class="breakdown"><span><b>engagement_velocity</b>14.8</span><span><b>source_authority</b>18.0</span><span><b>cross_source_confirmation</b>4.5</span><span><b>market_relevance</b>6.7</span><span><b>keyword_match</b>1.2</span><span><b>trend_boost</b>0.0</span><span><b>time_decay</b>0.3</span><span><b>emergency_boost</b>15</span></div>
+              </div>
+            </article>
+            
+            <article class="hotspot">
+              <div class="rank">#6</div>
+              <div class="hotspot-main">
+                <div class="hotspot-title">
+                  <h3>Tesla earnings and guidance draw investor attention</h3>
+                  <strong>46.0</strong>
+                </div>
+                <p>1 independent mock sources are discussing Tesla in a earnings context.</p>
+                <div class="chips">
+                  <span>earnings</span>
+                  <span>1 sources</span>
+                  <span>low priority</span>
+                </div>
+                <div class="entities">Tesla</div>
+                <div class="breakdown"><span><b>engagement_velocity</b>13.8</span><span><b>source_authority</b>18.0</span><span><b>cross_source_confirmation</b>4.5</span><span><b>market_relevance</b>7.5</span><span><b>keyword_match</b>1.9</span><span><b>trend_boost</b>0.0</span><span><b>time_decay</b>0.3</span><span><b>emergency_boost</b>0</span></div>
+              </div>
+            </article>
+            
+            <article class="hotspot">
+              <div class="rank">#7</div>
+              <div class="hotspot-main">
+                <div class="hotspot-title">
+                  <h3>Gold, Treasury macro data and yields drive discussion</h3>
+                  <strong>41.1</strong>
+                </div>
+                <p>1 independent mock sources are discussing Gold, Treasury in a macro data context.</p>
+                <div class="chips">
+                  <span>macro_data</span>
+                  <span>1 sources</span>
+                  <span>low priority</span>
+                </div>
+                <div class="entities">Gold, Treasury</div>
+                <div class="breakdown"><span><b>engagement_velocity</b>13.3</span><span><b>source_authority</b>18.0</span><span><b>cross_source_confirmation</b>4.5</span><span><b>market_relevance</b>5.0</span><span><b>keyword_match</b>0.0</span><span><b>trend_boost</b>0.0</span><span><b>time_decay</b>0.3</span><span><b>emergency_boost</b>0</span></div>
+              </div>
+            </article>
+            
+            <article class="hotspot">
+              <div class="rank">#8</div>
+              <div class="hotspot-main">
+                <div class="hotspot-title">
+                  <h3>Oil macro policy signals move into focus</h3>
+                  <strong>40.4</strong>
+                </div>
+                <p>1 independent mock sources are discussing Oil in a central bank context.</p>
+                <div class="chips">
+                  <span>central_bank</span>
+                  <span>1 sources</span>
+                  <span>low priority</span>
+                </div>
+                <div class="entities">Oil</div>
+                <div class="breakdown"><span><b>engagement_velocity</b>12.7</span><span><b>source_authority</b>18.0</span><span><b>cross_source_confirmation</b>4.5</span><span><b>market_relevance</b>5.0</span><span><b>keyword_match</b>0.0</span><span><b>trend_boost</b>0.0</span><span><b>time_decay</b>0.3</span><span><b>emergency_boost</b>0</span></div>
+              </div>
+            </article>
+            
+      </section>
+      <section id="contents" class="section">
+        <div class="section-head"><div><p class="eyebrow">Generated Posts</p><h2>生成文案与配图</h2></div></div>
+        
+            <article class="content-card">
+              <img src="cards/evt_20260516_002_en_a_16x9.png" alt="card" />
+              <div>
+                <div class="chips">
+                  <span>en</span>
+                  <span>professional_news</span>
+                  <span>llm</span>
+                  <span class="badge ok">ok</span>
+                </div>
+                <p>Multiple independent sources are tracking CPI, Fed, and Treasury developments as macro policy signals come into focus. Market attention centers on the interplay between inflation data, central bank posture, and fiscal dynamics. #CPI #Fed #Treasury #Macro Not investment advice.</p>
+              </div>
+            </article>
+            
+            <article class="content-card">
+              <img src="cards/evt_20260516_002_zh_a_16x9.png" alt="card" />
+              <div>
+                <div class="chips">
+                  <span>zh</span>
+                  <span>professional_news</span>
+                  <span>llm</span>
+                  <span class="badge ok">ok</span>
+                </div>
+                <p>市场焦点转向通胀数据、美联储信号及美债动向，多个独立信源正在追踪央行政策路径。 #CPI #美联储 #美债 #宏观 不构成投资建议。</p>
+              </div>
+            </article>
+            
+            <article class="content-card">
+              <img src="cards/evt_20260516_002_en_b_16x9.png" alt="card" />
+              <div>
+                <div class="chips">
+                  <span>en</span>
+                  <span>educational</span>
+                  <span>llm</span>
+                  <span class="badge ok">ok</span>
+                </div>
+                <p>CPI data offers clues about inflation, while the Fed and Treasury shape policy responses. These signals can influence borrowing costs and market conditions. Not investment advice. #CPI #Fed #Treasury #Macro</p>
+              </div>
+            </article>
+            
+            <article class="content-card">
+              <img src="cards/evt_20260516_002_zh_b_16x9.png" alt="card" />
+              <div>
+                <div class="chips">
+                  <span>zh</span>
+                  <span>educational</span>
+                  <span>llm</span>
+                  <span class="badge ok">ok</span>
+                </div>
+                <p>市场关注的三大宏观信号——CPI、美联储政策预期与财政部发债节奏——正交织影响资金成本预期。理解它们的互动，有助于看清利率环境的逻辑。通胀数据引导加息终点猜想，联储表态塑造政策路径，国债供给量则传递财政立场。三者共同作用，构成大环境背景。 #CPI #美联储 #美债 #宏观
+不构成投资建议。</p>
+              </div>
+            </article>
+            
+            <article class="content-card">
+              <img src="cards/evt_20260516_001_en_a_16x9.png" alt="card" />
+              <div>
+                <div class="chips">
+                  <span>en</span>
+                  <span>commentary</span>
+                  <span>rules_fallback</span>
+                  <span class="badge warn">timeout</span>
+                </div>
+                <p>Market note: BTC, Bitcoin, ETF is supported by available mock evidence. 9 independent mock sources are discussing BTC, Bitcoin, ETF in a crypto etf context. Not investment advice. #BTC #Bitcoin #ETF #Ethereum #US</p>
+              </div>
+            </article>
+            
+            <article class="content-card">
+              <img src="cards/evt_20260516_001_zh_a_16x9.png" alt="card" />
+              <div>
+                <div class="chips">
+                  <span>zh</span>
+                  <span>commentary</span>
+                  <span>llm</span>
+                  <span class="badge ok">ok</span>
+                </div>
+                <p>关于#BTC 和 #以太坊 ETF资金流向的讨论正在升温，多个信源观察到这一趋势。美国市场的动态持续吸引眼球，但需冷静看待。这些更多是情绪的早期信号，而非趋势确认。#比特币 #ETF #US 不构成投资建议。</p>
+              </div>
+            </article>
+            
+            <article class="content-card">
+              <img src="cards/evt_20260516_001_en_b_16x9.png" alt="card" />
+              <div>
+                <div class="chips">
+                  <span>en</span>
+                  <span>professional_news</span>
+                  <span>rules_fallback</span>
+                  <span class="badge warn">timeout</span>
+                </div>
+                <p>Market brief: BTC, Bitcoin, ETF is supported by available mock evidence. 9 independent mock sources are discussing BTC, Bitcoin, ETF in a crypto etf context. Not investment advice. #BTC #Bitcoin #ETF #Ethereum #US</p>
+              </div>
+            </article>
+            
+            <article class="content-card">
+              <img src="cards/evt_20260516_001_zh_b_16x9.png" alt="card" />
+              <div>
+                <div class="chips">
+                  <span>zh</span>
+                  <span>professional_news</span>
+                  <span>llm</span>
+                  <span class="badge ok">ok</span>
+                </div>
+                <p>近期市场关注点转向加密 ETF，多个独立消息源聚焦 BTC 与以太坊的讨论。美国市场相关动态引发对资金流向的广泛观察，目前大多信息已被交叉验证。 #BTC #比特币 #ETF #以太坊 #US 不构成投资建议。</p>
+              </div>
+            </article>
+            
+      </section>
+      <section id="publishing" class="section">
+        <div class="section-head"><div><p class="eyebrow">Publishing Evidence</p><h2>发布、A/B 与反馈闭环</h2></div></div>
+        <div class="two-col">
+          <div><h3>Mock 发布记录</h3>
+            <article class="publish">
+              <div class="publish-top">
+                <strong>mock_post_001</strong>
+                <span class="badge ok">published</span>
+              </div>
+              <p>Multiple independent sources are tracking CPI, Fed, and Treasury developments as macro policy signals come into focus. Market attention centers on the interplay between inflation data, central bank posture, and fiscal dynamics. #CPI #Fed #Treasury #Macro Not investment advice.</p>
+              <div class="chips">
+                <span>A</span>
+                <span>professional_news</span>
+                <span>cnt_evt_20260516_002_en</span>
+              </div>
+              <a href="http://localhost:8000/mock_x/posts/mock_post_001">打开 Mock 链接</a>
+            </article>
+            
+            <article class="publish">
+              <div class="publish-top">
+                <strong>mock_post_002</strong>
+                <span class="badge ok">published</span>
+              </div>
+              <p>市场焦点转向通胀数据、美联储信号及美债动向，多个独立信源正在追踪央行政策路径。 #CPI #美联储 #美债 #宏观 不构成投资建议。</p>
+              <div class="chips">
+                <span>A</span>
+                <span>professional_news</span>
+                <span>cnt_evt_20260516_002_zh</span>
+              </div>
+              <a href="http://localhost:8000/mock_x/posts/mock_post_002">打开 Mock 链接</a>
+            </article>
+            
+            <article class="publish">
+              <div class="publish-top">
+                <strong>mock_post_003</strong>
+                <span class="badge ok">published</span>
+              </div>
+              <p>CPI data offers clues about inflation, while the Fed and Treasury shape policy responses. These signals can influence borrowing costs and market conditions. Not investment advice. #CPI #Fed #Treasury #Macro</p>
+              <div class="chips">
+                <span>B</span>
+                <span>educational</span>
+                <span>cnt_evt_20260516_002_en_b</span>
+              </div>
+              <a href="http://localhost:8000/mock_x/posts/mock_post_003">打开 Mock 链接</a>
+            </article>
+            
+            <article class="publish">
+              <div class="publish-top">
+                <strong>mock_post_004</strong>
+                <span class="badge ok">published</span>
+              </div>
+              <p>市场关注的三大宏观信号——CPI、美联储政策预期与财政部发债节奏——正交织影响资金成本预期。理解它们的互动，有助于看清利率环境的逻辑。通胀数据引导加息终点猜想，联储表态塑造政策路径，国债供给量则传递财政立场。三者共同作用，构成大环境背景。 #CPI #美联储 #美债 #宏观
+不构成投资建议。</p>
+              <div class="chips">
+                <span>B</span>
+                <span>educational</span>
+                <span>cnt_evt_20260516_002_zh_b</span>
+              </div>
+              <a href="http://localhost:8000/mock_x/posts/mock_post_004">打开 Mock 链接</a>
+            </article>
+            
+            <article class="publish">
+              <div class="publish-top">
+                <strong>mock_post_005</strong>
+                <span class="badge ok">published</span>
+              </div>
+              <p>Market note: BTC, Bitcoin, ETF is supported by available mock evidence. 9 independent mock sources are discussing BTC, Bitcoin, ETF in a crypto etf context. Not investment advice. #BTC #Bitcoin #ETF #Ethereum #US</p>
+              <div class="chips">
+                <span>A</span>
+                <span>commentary</span>
+                <span>cnt_evt_20260516_001_en</span>
+              </div>
+              <a href="http://localhost:8000/mock_x/posts/mock_post_005">打开 Mock 链接</a>
+            </article>
+            
+            <article class="publish">
+              <div class="publish-top">
+                <strong>mock_post_006</strong>
+                <span class="badge ok">published</span>
+              </div>
+              <p>关于#BTC 和 #以太坊 ETF资金流向的讨论正在升温，多个信源观察到这一趋势。美国市场的动态持续吸引眼球，但需冷静看待。这些更多是情绪的早期信号，而非趋势确认。#比特币 #ETF #US 不构成投资建议。</p>
+              <div class="chips">
+                <span>A</span>
+                <span>commentary</span>
+                <span>cnt_evt_20260516_001_zh</span>
+              </div>
+              <a href="http://localhost:8000/mock_x/posts/mock_post_006">打开 Mock 链接</a>
+            </article>
+            </div>
+          <div><h3>A/B 测试</h3><article class='mini-card'><h3>ab_evt_20260516_002</h3><ul>
+            <li>
+              <span>A / professional_news</span>
+              <b>1.39% winner</b>
+            </li>
+            
+            <li>
+              <span>B / educational</span>
+              <b>1.35% </b>
+            </li>
+            </ul></article><article class='mini-card'><h3>ab_evt_20260516_002_zh</h3><ul>
+            <li>
+              <span>A / professional_news</span>
+              <b>2.58% winner</b>
+            </li>
+            
+            <li>
+              <span>B / educational</span>
+              <b>1.41% </b>
+            </li>
+            </ul></article><article class='mini-card'><h3>ab_evt_20260516_001</h3><ul>
+            <li>
+              <span>A / commentary</span>
+              <b>2.20% winner</b>
+            </li>
+            
+            <li>
+              <span>B / professional_news</span>
+              <b>0.00% </b>
+            </li>
+            </ul></article><article class='mini-card'><h3>ab_evt_20260516_001_zh</h3><ul>
+            <li>
+              <span>A / commentary</span>
+              <b>2.14% winner</b>
+            </li>
+            
+            <li>
+              <span>B / professional_news</span>
+              <b>0.00% </b>
+            </li>
+            </ul></article></div>
+        </div>
+        <h3>策略记忆与反馈指标</h3>
+        <p class='muted'>已回收 6 条互动指标。</p><div class='mini-grid'><article class='mini-card'><h3>Style Weight</h3><ul><li><span>educational</span><b>1.091</b></li><li><span>professional_news</span><b>1.089</b></li><li><span>commentary</span><b>1.078</b></li></ul></article><article class='mini-card'><h3>Source Weight</h3><ul><li><span>evt_20260516_002</span><b>1.06</b></li><li><span>evt_20260516_001</span><b>1.026</b></li></ul></article><article class='mini-card'><h3>Hashtag Weight</h3><ul><li><span>#CPI</span><b>1.089</b></li><li><span>#美联储</span><b>1.048</b></li><li><span>#美债</span><b>1.048</b></li><li><span>#宏观</span><b>1.048</b></li><li><span>#Fed</span><b>1.041</b></li><li><span>#Treasury</span><b>1.041</b></li></ul></article></div>
+      </section>
+      <section id="artifacts" class="section">
+        <div class="section-head"><div><p class="eyebrow">Artifacts</p><h2>交付物入口</h2></div></div>
+        <div class="artifacts"><a class='artifact' href='state.json'><strong>状态快照</strong><span>state.json</span></a><a class='artifact' href='cards/'><strong>卡片目录</strong><span>cards/</span></a><a class='artifact' href='reports/'><strong>合规报告目录</strong><span>reports/</span></a><a class='artifact' href='../docs/architecture.md'><strong>架构文档</strong><span>../docs/architecture.md</span></a><a class='artifact' href='../docs/prompt_design.md'><strong>Prompt 设计</strong><span>../docs/prompt_design.md</span></a><a class='artifact' href='../backend/app/agents/agent_manifest.yaml'><strong>Agent Manifest</strong><span>../backend/app/agents/agent_manifest.yaml</span></a></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

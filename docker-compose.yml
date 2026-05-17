@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: x_hotspot_postgres
+    environment:
+      POSTGRES_DB: x_hotspot_agent
+      POSTGRES_USER: agent
+      POSTGRES_PASSWORD: agent_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/app/db/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent -d x_hotspot_agent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: .
+    container_name: x_hotspot_backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      X_MODE: mock
+      ENABLE_REAL_PUBLISH: "false"
+      REVIEW_REQUIRED: "true"
+      USE_DATABASE: "true"
+      DB_FALLBACK_TO_JSON: "false"
+      DATABASE_URL: postgresql+psycopg://agent:agent_password@postgres:5432/x_hotspot_agent
+      PUBLIC_BASE_URL: http://localhost:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./outputs:/app/outputs
+
+volumes:
+  postgres_data:

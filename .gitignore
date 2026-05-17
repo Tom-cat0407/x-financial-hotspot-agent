@@ -1,0 +1,12 @@
+__pycache__/
+.pytest_cache/
+.venv/
+.audit/
+node_modules/
+frontend/dist/
+outputs/server.*.log
+deliverables/
+*.pyc
+.env
+deepseek.txt
+火山方舟.txt

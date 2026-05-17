@@ -1,0 +1,15 @@
+{
+  "Bitcoin": "BTC 24h move: +2.1%; liquidity snapshot available in mock market data.",
+  "ETF": "Spot ETF flow monitor: net inflow discussion flagged, source count requires review.",
+  "Fed": "Next FOMC decision window tracked; rate expectations remain data dependent.",
+  "CPI": "Latest mock CPI signal: inflation remains the macro variable most cited by sources.",
+  "Nvidia": "NVDA mock quote snapshot: AI infrastructure demand remains an earnings theme.",
+  "Tesla": "TSLA mock quote snapshot: delivery and margin commentary are active discussion points.",
+  "Apple": "AAPL mock quote snapshot: mega-cap earnings and AI spending discipline are being monitored.",
+  "Microsoft": "MSFT mock quote snapshot: cloud and AI capex remain key investor themes.",
+  "SEC": "Regulatory event flagged. Official confirmation should be checked before real publishing.",
+  "CFTC": "CFTC regulatory action monitor: compliance-related headlines require source confirmation.",
+  "Treasury": "US Treasury yield snapshot: long-end yields remain sensitive to inflation expectations.",
+  "Oil": "Oil market snapshot: Brent and WTI are reacting to supply-risk discussion.",
+  "Gold": "Gold market snapshot: price discussion remains tied to yields and dollar moves."
+}

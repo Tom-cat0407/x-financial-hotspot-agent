@@ -1,0 +1,17 @@
+accounts:
+  - handle: Bloomberg
+    source_type: media
+  - handle: Reuters
+    source_type: media
+  - handle: WSJ
+    source_type: media
+  - handle: CoinDesk
+    source_type: media
+  - handle: FinancialTimes
+    source_type: media
+  - handle: MarketWatch
+    source_type: media
+  - handle: CNBC
+    source_type: media
+  - handle: TheBlock
+    source_type: media

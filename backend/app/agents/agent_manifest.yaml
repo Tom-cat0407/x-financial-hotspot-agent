@@ -1,0 +1,39 @@
+orchestration:
+  mode: state_machine
+  coordinator: backend.app.workflows.hotspot_pipeline.HotspotPipeline
+  rationale: >
+    Financial content workflows need reproducible state, audit trails, and
+    deterministic compliance gates. The modules below are intentionally scoped
+    like Claude Code sub-agents but are coordinated by a state machine rather
+    than by unconstrained chat.
+agents:
+  - name: collector
+    module: backend.app.agents.collector_agent
+    responsibility: collect account, keyword, and trending-topic inputs
+  - name: normalizer
+    module: backend.app.agents.normalizer_agent
+    responsibility: normalize source posts and prepare text features
+  - name: entity_extractor
+    module: backend.app.agents.entity_extractor_agent
+    responsibility: extract financial entities and event type
+  - name: clusterer
+    module: backend.app.agents.clusterer_agent
+    responsibility: merge posts into event clusters using similarity signals
+  - name: emergency_priority
+    module: backend.app.agents.emergency_priority_agent
+    responsibility: identify major financial events and assign emergency boosts
+  - name: rag_fact_check
+    module: backend.app.agents.rag_fact_check_agent
+    responsibility: verify claims against mock or optional external finance data
+  - name: hashtag
+    module: backend.app.agents.hashtag_agent
+    responsibility: generate bilingual finance hashtags
+  - name: tweet_generator
+    module: backend.app.agents.tweet_generator_agent
+    responsibility: generate compliant English and Chinese content variants
+  - name: compliance_guard
+    module: backend.app.agents.compliance_guard_agent
+    responsibility: enforce financial-content policy rules and LLM review
+  - name: image_card
+    module: backend.app.agents.image_card_agent
+    responsibility: render shareable content cards
